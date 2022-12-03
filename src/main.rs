@@ -1,7 +1,6 @@
 use std::fs;
 use axum::{routing::{get, post}, Router, Json};
 use axum::response::{Html, IntoResponse};
-use bendy::decoding::{Decoder, Error, Object};
 use serde::{Serialize,Deserialize};
 use axum::extract::Multipart;
 
@@ -70,6 +69,9 @@ async fn root() -> Html<&'static str> {
 
 }
 
+const SAVE_FILE_BASE_PATH: &str = "/User/eyeseas/Downloads/upload";
+
+
 async fn get_torrent(mut multipart:Multipart) -> impl IntoResponse {
 
     let mut torrent_file:Torrent = Torrent {
@@ -85,10 +87,18 @@ async fn get_torrent(mut multipart:Multipart) -> impl IntoResponse {
     while let Some(field) = multipart.next_field().await.unwrap() {
         let name = field.name().unwrap();
         if name == "file" {
+
             let bytes = field.bytes().await.unwrap();
-            // let torrent_file: Torrent = serde_bencode::from_bytes(bytes.as_ref()).unwrap();
             torrent_file = serde_bencoded::from_bytes(bytes.as_ref()).unwrap();
-            // torrent.info.name = torrent_file.info.name;
+
+            // TODO 存文件失败
+            // let torrent_name = torrent_file.info.name.clone().replace(" ", "_");
+            // let save_filename = format!("{}/{}.{}", SAVE_FILE_BASE_PATH, torrent_name, "torrent");
+            //
+            // println!("{}",save_filename);
+            // tokio::fs::write(&save_filename, &bytes)
+            //     .await
+            //     .map_err(|err| err.to_string()).expect("Error");
         }
     }
 

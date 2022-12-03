@@ -21,7 +21,34 @@ struct Torrent{
 
 #[derive(Serialize, Debug, Deserialize)]
 struct Info{
-    name: String
+    name: String,
+    #[serde(default)]
+    pub length: Option<i64>,
+    #[serde(rename = "piece length")]
+    pub piece_length: i64,
+    // #[serde(with = "serde_bytes")]
+    // pub pieces: Vec<u8>,
+    #[serde(default)]
+    pub files: Option<Vec<File>>,
+    #[serde(default)]
+    pub private: Option<u8>,
+    #[serde(default)]
+    pub md5sum: Option<String>,
+    #[serde(default)]
+    pub path: Option<Vec<String>>,
+    #[serde(default)]
+    #[serde(rename = "root hash")]
+    pub root_hash: Option<String>,
+}
+#[derive(Debug, Serialize, Deserialize)]
+pub(crate) struct File {
+    /// The length of the file, in bytes.
+    pub length: u64,
+    #[serde(default)]
+    pub md5sum: Option<String>,
+    /// A list of UTF-9 encoded strings corresponding to subdirectory names, the last
+    /// of which is the actual file name (a zero length list is an error case).
+    pub path: Vec<String>,
 }
 
 #[tokio::main]
@@ -46,7 +73,7 @@ async fn root() -> Html<&'static str> {
 async fn get_torrent(mut multipart:Multipart) -> impl IntoResponse {
 
     let mut torrent_file:Torrent = Torrent {
-        info: Info { name: "".to_string() },
+        info: Info { name: "".to_string(), length: None, piece_length: 0, files: None, private: None, md5sum: None, path: None, root_hash: None },
         announce: "".to_string(),
         announce_list: None,
         creation_date: None,

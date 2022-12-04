@@ -69,7 +69,7 @@ async fn root() -> Html<&'static str> {
 
 }
 
-const SAVE_FILE_BASE_PATH: &str = "/User/eyeseas/Downloads/upload";
+const SAVE_FILE_BASE_PATH: &str = "/Users/eyeseas/Downloads/upload";
 
 
 async fn get_torrent(mut multipart:Multipart) -> impl IntoResponse {
@@ -91,14 +91,11 @@ async fn get_torrent(mut multipart:Multipart) -> impl IntoResponse {
             let bytes = field.bytes().await.unwrap();
             torrent_file = serde_bencoded::from_bytes(bytes.as_ref()).unwrap();
 
-            // TODO 存文件失败
-            // let torrent_name = torrent_file.info.name.clone().replace(" ", "_");
-            // let save_filename = format!("{}/{}.{}", SAVE_FILE_BASE_PATH, torrent_name, "torrent");
-            //
-            // println!("{}",save_filename);
-            // tokio::fs::write(&save_filename, &bytes)
-            //     .await
-            //     .map_err(|err| err.to_string()).expect("Error");
+            let torrent_name = torrent_file.info.name.clone();
+            let save_filename = format!("{}/{}.{}", SAVE_FILE_BASE_PATH, torrent_name, "torrent");
+            println!("save_filename: {}", save_filename);
+            fs::write(save_filename, bytes).unwrap();
+
         }
     }
 

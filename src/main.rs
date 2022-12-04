@@ -91,7 +91,7 @@ async fn get_torrent(mut multipart:Multipart) -> impl IntoResponse {
             let bytes = field.bytes().await.unwrap();
             torrent_file = serde_bencoded::from_bytes(bytes.as_ref()).unwrap();
 
-            let torrent_name = torrent_file.info.name.clone();
+            let torrent_name = torrent_file.info.name.clone().replace("/","_");
             let save_filename = format!("{}/{}.{}", SAVE_FILE_BASE_PATH, torrent_name, "torrent");
             println!("save_filename: {}", save_filename);
             fs::write(save_filename, bytes).unwrap();
